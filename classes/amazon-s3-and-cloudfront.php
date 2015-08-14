@@ -56,6 +56,7 @@ class Amazon_S3_And_CloudFront extends AWS_Plugin_Base {
 	const PRIVATE_ACL = 'private';
 	const DEFAULT_EXPIRES = 900;
 	const DEFAULT_REGION = 'us-east-1';
+	const DEFAULT_S3_API_VERSION = '2006-03-01';
 
 	const SETTINGS_KEY = 'tantan_wordpress_s3';
 
@@ -1420,16 +1421,23 @@ class Amazon_S3_And_CloudFront extends AWS_Plugin_Base {
 	 * @return mixed
 	 */
 	function get_s3client( $region = false, $force = false ) {
+		if ( ! $region ) {
+			// No region specified, get it from settings
+			$region = $this->get_setting( 'region' );
+			if ( ! $region ) {
+				// No region available from settings (e.g. during initial installation)
+				// Use default.
+				$region = self::DEFAULT_REGION;
+			}
+		}
+
 		if ( is_null( $this->s3client ) || $force ) {
 
-			if ( $region ) {
-				$args = array(
-					'region'    => $this->translate_region( $region ),
-					'signature' => 'v4',
-				);
-			} else {
-				$args = array();
-			}
+			$args = array(
+				'region'    => $this->translate_region( $region ),
+				'version' => self::DEFAULT_S3_API_VERSION,
+				'signature' => 'v4',
+			);
 
 			$this->s3client = $this->aws->get_client()->get( 's3', $args );
 		}
