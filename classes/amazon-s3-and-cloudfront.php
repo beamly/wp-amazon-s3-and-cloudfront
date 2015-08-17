@@ -1422,13 +1422,8 @@ class Amazon_S3_And_CloudFront extends AWS_Plugin_Base {
 	 */
 	function get_s3client( $region = false, $force = false ) {
 		if ( ! $region ) {
-			// No region specified, get it from settings
-			$region = $this->get_setting( 'region' );
-			if ( ! $region ) {
-				// No region available from settings (e.g. during initial installation)
-				// Use default.
-				$region = self::DEFAULT_REGION;
-			}
+			// No region available  - use default
+			$region = self::DEFAULT_REGION;
 		}
 
 		if ( is_null( $this->s3client ) || $force ) {
